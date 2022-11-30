@@ -1,5 +1,7 @@
-﻿using AdvancedWebApi.Interfaces;
+﻿using AdvancedWebApi.DTO;
+using AdvancedWebApi.Interfaces;
 using AdvancedWebApi.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
@@ -11,17 +13,19 @@ namespace AdvancedWebApi.Controller
     public class PokemonController : ControllerBase
     {
         private readonly IPokemonRepository _pokemonRepository;
+        private readonly IMapper _mapper;
 
-        public PokemonController(IPokemonRepository pokemonRepository)
+        public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper)
         {
             _pokemonRepository = pokemonRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         public IActionResult GetPokemons()
         {
-            var pokemons = _pokemonRepository.GetPokemons();
+            var pokemons =_mapper.Map<List<PokemonDTO>>(_pokemonRepository.GetPokemons());
 
             if (!ModelState.IsValid)
             {
@@ -41,7 +45,7 @@ namespace AdvancedWebApi.Controller
                 return NotFound();
             }
 
-            var pokemon = _pokemonRepository.GetPokemon(pokeId);
+            var pokemon =_mapper.Map<PokemonDTO>(_pokemonRepository.GetPokemon(pokeId));
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
