@@ -66,5 +66,31 @@ namespace AdvancedWebApi.Controller
 
             return Ok(pokemons);
         }
+
+
+        [HttpPost,ProducesResponseType(204), ProducesResponseType(400)]
+        public IActionResult CreateCateogry([FromBody] CategoryDTO categoryDTO)
+        {
+            if (categoryDTO == null)
+                return BadRequest(ModelState);
+            var category = _categoryRepository.GetAllCategories()
+                .Where(c=>c.Name.Trim().ToLower()==categoryDTO.Name.TrimEnd().ToLower()).FirstOrDefault();
+            if (category!=null)
+            {
+                ModelState.AddModelError("", "Category Already Exists");
+                return StatusCode(402, ModelState);
+            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var categoryMap = _mapper.Map<Category>(categoryDTO);
+            if (!_categoryRepository.CreateCategory(categoryMap))
+            {
+                ModelState.AddModelError("", "Something went wrong on saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(422, ModelState);
+        }
     }
 }

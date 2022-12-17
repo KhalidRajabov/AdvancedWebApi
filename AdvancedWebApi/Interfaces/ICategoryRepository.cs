@@ -8,5 +8,7 @@ namespace AdvancedWebApi.Interfaces
         Category GetCategory(int id);
         ICollection<Pokemon> GetPokemonByCategory(int CategoryId);
         bool CategoryExist(int id);
+        bool CreateCategory(Category category);
+        bool Save();
     }
 }

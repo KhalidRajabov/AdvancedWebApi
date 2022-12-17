@@ -14,11 +14,13 @@ namespace AdvancedWebApi.Controller
     public class OwnerController : ControllerBase
     {
         private readonly IOwnerRepository _ownerRepository;
+        private readonly ICountryRepository _countryRepository;
         private readonly IMapper _mapper;
 
-        public OwnerController(IOwnerRepository ownerRepository, IMapper mapper)
+        public OwnerController(IOwnerRepository ownerRepository, ICountryRepository countryRepository,IMapper mapper)
         {
             _ownerRepository = ownerRepository;
+            _countryRepository = countryRepository;
             _mapper = mapper;
         }
 
@@ -67,6 +69,32 @@ namespace AdvancedWebApi.Controller
                 return BadRequest();
 
             return Ok(pokemons);
+        }
+
+        [HttpPost, ProducesResponseType(204), ProducesResponseType(400)]
+        public IActionResult CreateOwner([FromQuery] int countryId,[FromBody] OwnerDTO ownerDTO)
+        {
+            if (ownerDTO == null)
+                return BadRequest(ModelState);
+            var owner = _ownerRepository.GetOwners()
+                .Where(c => c?.Firstname?.Trim().ToLower() == ownerDTO?.Firstname?.TrimEnd().ToLower()&& c?.Lastname?.Trim().ToLower() == ownerDTO?.Lastname?.TrimEnd().ToLower()).FirstOrDefault();
+            if (owner!= null)
+            {
+                ModelState.AddModelError("", "Owner Already Exists");
+                return StatusCode(402, ModelState);
+            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var ownerMap = _mapper.Map<Owner>(ownerDTO);
+            ownerMap.Country = _countryRepository.GetCountry(countryId);
+            if (!_ownerRepository.CreateOwner(ownerMap))
+            {
+                ModelState.AddModelError("", "Something went wrong on saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(422, ModelState);
         }
     }
 }

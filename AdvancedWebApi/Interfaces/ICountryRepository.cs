@@ -9,5 +9,7 @@ namespace AdvancedWebApi.Interfaces
         Country GetCountryByOwner(int ownerId);
         ICollection<Owner> GetOwnersFromACountry(int countryId);
         bool CountryExist(int id);
+        bool CreateCountry(Country country);
+        bool Save();
     }
 }

@@ -14,6 +14,11 @@ namespace AdvancedWebApi.Helper
             CreateMap<Owner, OwnerDTO>();
             CreateMap<Review, ReviewDTO>();
             CreateMap<Reviewer, ReviewerDTO>();
+
+
+            CreateMap<CategoryDTO, Category>();
+            CreateMap<CountryDTO, Country>();
+            CreateMap<OwnerDTO, Owner>();
         }
     }
 }

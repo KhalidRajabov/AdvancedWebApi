@@ -64,5 +64,30 @@ namespace AdvancedWebApi.Controller
             
             return Ok(country);
         }
+
+        [HttpPost, ProducesResponseType(204), ProducesResponseType(400)]
+        public IActionResult CreateCountry([FromBody] CountryDTO countryDTO)
+        {
+            if (countryDTO == null)
+                return BadRequest(ModelState);
+            var category = _countryRepository.GetCountries()
+                .Where(c => c.Name.Trim().ToLower() == countryDTO.Name.TrimEnd().ToLower()).FirstOrDefault();
+            if (category != null)
+            {
+                ModelState.AddModelError("", "Country Already Exists");
+                return StatusCode(402, ModelState);
+            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var countryMap = _mapper.Map<Country>(countryDTO);
+            if (!_countryRepository.CreateCountry(countryMap))
+            {
+                ModelState.AddModelError("", "Something went wrong on saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return StatusCode(422, ModelState);
+        }
     }
 }

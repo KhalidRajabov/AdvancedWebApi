@@ -9,5 +9,7 @@ namespace AdvancedWebApi.Interfaces
         ICollection<Owner> GetAnOwnerOfAPokemon(int pokeId);
         ICollection<Pokemon> GetPokemonsByAnOwner(int ownerId);
         bool OwnerExists(int ownerId);
+        bool CreateOwner(Owner owner);
+        bool Save();
     }
 }
